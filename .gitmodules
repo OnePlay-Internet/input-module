@@ -1,3 +1,6 @@
 [submodule "third-party/moonlight-common-c"]
 	path = third-party/moonlight-common-c
 	url = https://github.com/moonlight-stream/moonlight-common-c.git
+[submodule "third-party/ViGEmClient"]
+	path = third-party/ViGEmClient
+	url = https://github.com/ViGEm/ViGEmClient.git

@@ -1,37 +1,52 @@
-// Created by loki on 6/20/19.
+#ifndef INPUT_MODULE_H
+#define INPUT_MODULE_H
 
-#ifndef SUNSHINE_INPUT_H
-#define SUNSHINE_INPUT_H
-
-#if 0
-#include <functional>
-
-#include "platform/common.h"
-#include "thread_safe.h"
-
-namespace input {
-struct input_t;
-
-void print(void *input);
-void reset(std::shared_ptr<input_t> &input);
-void passthrough(std::shared_ptr<input_t> &input, std::vector<std::uint8_t> &&input_data);
-
-
-[[nodiscard]] std::unique_ptr<platf::deinit_t> init();
-
-std::shared_ptr<input_t> alloc(safe::mail_t mail);
-
-struct touch_port_t : public platf::touch_port_t {
-  int env_width, env_height;
-
-  // Offset x and y coordinates of the client
-  float client_offsetX, client_offsetY;
-
-  float scalar_inv;
-};
-} // namespace input
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-int input_init();
+#include <stdint.h>
 
-#endif // SUNSHINE_INPUT_H
+typedef struct input_t_ input_t;
+
+typedef struct input_config_t_ {
+    // Dimensions for touchscreen input
+    int offset_x;
+    int offset_y;
+    int width;
+    int height;
+    int env_width;
+    int env_height;
+    // Offset x and y coordinates of the client
+    float client_offsetX;
+    float client_offsetY;
+    float scalar_inv;
+
+    // key bindings
+    int* keybindings_key;
+    int* keybindings_value;
+    int keybindings_len;
+
+    int64_t back_button_timeout; // in ms
+    int64_t key_repeat_delay; // in ms
+    double key_repeat_period;
+
+    // supported gamepad: "x360", "ds4", "ps4" (ds4 == ps4)
+    char gamepad[16];
+} input_config_t;
+
+input_t* input_init(input_config_t* iconfig);
+
+int input_deinit(input_t *in);
+
+int input_reset(input_t *in);
+
+int input_print(input_t *in, void *data);
+
+int input_passthrough(input_t *in, uint8_t *data);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif // ONEPLAY_INPUT_MODULE_H
