@@ -9,7 +9,7 @@ set(inputmodule_SOURCE_FILES
     src/config.h
     src/input_impl.cpp
     src/input_impl.h
-    src/input.cpp
+    src/input_module.cpp
     src/main.h
     src/move_by_copy.h
     src/task_pool.h

@@ -7,9 +7,9 @@ extern "C" {
 
 #include <stdint.h>
 
-typedef struct input_t_ input_t;
+typedef struct inpmod_t_ inpmod_t;
 
-typedef struct input_config_t_ {
+typedef struct inpmod_screen_cfg_t_ {
     // Dimensions for touchscreen input
     int offset_x;
     int offset_y;
@@ -21,7 +21,9 @@ typedef struct input_config_t_ {
     float client_offsetX;
     float client_offsetY;
     float scalar_inv;
+} inpmod_screen_cfg_t;
 
+typedef struct inpmod_key_cfg_t_ {
     // key bindings
     int* keybindings_key;
     int* keybindings_value;
@@ -33,17 +35,17 @@ typedef struct input_config_t_ {
 
     // supported gamepad: "x360", "ds4", "ps4" (ds4 == ps4)
     char gamepad[16];
-} input_config_t;
+} inpmod_key_cfg_t;
 
-input_t* input_init(input_config_t* iconfig);
+inpmod_t* inpmod_init(inpmod_screen_cfg_t* screen_cfg = NULL, inpmod_key_cfg_t* key_cfg = NULL);
 
-int input_deinit(input_t *in);
+int inpmod_deinit(inpmod_t *in);
 
-int input_reset(input_t *in);
+int inpmod_reset(inpmod_t *in);
 
-int input_print(input_t *in, void *data);
+int inpmod_print(inpmod_t *in, void *data);
 
-int input_passthrough(input_t *in, uint8_t *data);
+int inpmod_passthrough(inpmod_t *in, inpmod_t *data, int len, inpmod_screen_cfg_t* screen_cfg = NULL);
 
 #ifdef __cplusplus
 } // extern "C"

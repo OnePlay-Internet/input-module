@@ -21,13 +21,14 @@ extern boost::log::sources::severity_logger<int> error;
 extern boost::log::sources::severity_logger<int> fatal;
 
 void log_flush();
+int log_init();
 
-void print_help(const char *name);
+// void print_help(const char *name);
 
-std::string read_file(const char *path);
-int write_file(const char *path, const std::string_view &contents);
+// std::string read_file(const char *path);
+// int write_file(const char *path, const std::string_view &contents);
 
-std::uint16_t map_port(int port);
+// std::uint16_t map_port(int port);
 
 namespace mail {
 #define MAIL(x) \
@@ -35,18 +36,8 @@ namespace mail {
 
 extern safe::mail_t man;
 
-// Global mail
-MAIL(shutdown);
-MAIL(broadcast_shutdown);
-
-MAIL(video_packets);
-MAIL(audio_packets);
-
-MAIL(switch_display);
-
 // Local mail
 MAIL(touch_port);
-MAIL(idr);
 MAIL(rumble);
 #undef MAIL
 } // namespace mail
