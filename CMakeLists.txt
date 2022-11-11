@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(input-module)
 
+set(Boost_USE_STATIC_LIBS ON)
+
+find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS log REQUIRED)
 
 set(inputmodule_SOURCE_FILES 
@@ -11,6 +14,7 @@ set(inputmodule_SOURCE_FILES
     src/input_impl.h
     src/input_module.cpp
     src/main.h
+    src/main.cpp
     src/move_by_copy.h
     src/task_pool.h
     src/thread_pool.h
@@ -22,6 +26,7 @@ set(inputmodule_SOURCE_FILES
 if(WIN32)
     set(inputmodule_PLATFORM_FILES
         src/platform/windows/input.cpp
+        src/platform/windows/misc.cpp
         third-party/ViGEmClient/src/ViGEmClient.cpp
         third-party/ViGEmClient/include/ViGEm/Client.h
         third-party/ViGEmClient/include/ViGEm/Common.h
@@ -39,6 +44,7 @@ add_library(inputmodule STATIC
 )
 
 target_include_directories(inputmodule PRIVATE
+    ${BOOST_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/third-party
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -49,4 +55,10 @@ if(WIN32)
     target_include_directories(inputmodule PRIVATE third-party/ViGEmClient/include)
 endif()
 
-target_link_libraries(inputmodule PRIVATE Boost::log)
+target_link_libraries(inputmodule PRIVATE
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${Boost_LIBRARIES}
+    setupapi)
+
+# Test
+add_subdirectory(tests)

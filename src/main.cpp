@@ -1,5 +1,7 @@
 // Created by loki on 5/30/19.
 
+#include <iostream>
+
 #include <boost/log/attributes/clock.hpp>
 #include <boost/log/common.hpp>
 #include <boost/log/expressions.hpp>
@@ -9,7 +11,6 @@
 using namespace std::literals;
 namespace bl = boost::log;
 
-util::ThreadPool task_pool;
 bl::sources::severity_logger<int> verbose(0); // Dominating output
 bl::sources::severity_logger<int> debug(1);   // Follow what is happening
 bl::sources::severity_logger<int> info(2);    // Should be informed about
@@ -21,6 +22,12 @@ bl::sources::severity_logger<int> fatal(5);   // Unrecoverable errors
 using text_sink = bl::sinks::asynchronous_sink<bl::sinks::text_ostream_backend>;
 boost::shared_ptr<text_sink> sink;
 
+struct NoDelete {
+  void operator()(void *) {}
+};
+
+BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", int)
+
 void log_flush() {
   sink->flush();
 }
@@ -30,7 +37,7 @@ int log_init() {
 
   boost::shared_ptr<std::ostream> stream { &std::cout, NoDelete {} };
   sink->locked_backend()->add_stream(stream);
-  sink->set_filter(severity >= 3);
+  sink->set_filter(severity >= 0);
 
   sink->set_formatter([message = "Message"s, severity = "Severity"s](const bl::record_view &view, bl::formatting_ostream &os) {
     constexpr int DATE_BUFFER_SIZE = 21 + 2 + 1; // Full string plus ": \0"

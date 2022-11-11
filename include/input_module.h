@@ -45,7 +45,7 @@ int inpmod_reset(inpmod_t *in);
 
 int inpmod_print(inpmod_t *in, void *data);
 
-int inpmod_passthrough(inpmod_t *in, inpmod_t *data, int len, inpmod_screen_cfg_t* screen_cfg = NULL);
+int inpmod_passthrough(inpmod_t *in, uint8_t *data, int len, inpmod_screen_cfg_t* screen_cfg = NULL);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -5,7 +5,8 @@
 #include "input_impl.h"
 
 safe::mail_t mail::man;
-bool display_cursor;
+bool display_cursor = true;
+util::ThreadPool task_pool;
 
 int _ = log_init();
 
@@ -32,6 +33,7 @@ input::touch_port_t make_port(inpmod_screen_cfg_t* screen_cfg) {
 
 typedef struct inpmod_t_ {
     bool init = false;
+    inpmod_screen_cfg_t* screen_cfg;
 } inpmod_t;
 
 inpmod_t* inpmod_inst = nullptr;
@@ -50,6 +52,8 @@ inpmod_t* inpmod_init(inpmod_screen_cfg_t* screen_cfg, inpmod_key_cfg_t* key_cfg
 
     inpmod_inst = new inpmod_t{};
     inpmod_inst->init = true;
+    inpmod_inst->screen_cfg = new inpmod_screen_cfg_t(*screen_cfg);
+    input::touch_port_event->raise(input::make_port(inpmod_inst->screen_cfg));
 
     return inpmod_inst;
 }
@@ -90,11 +94,15 @@ int inpmod_print(inpmod_t *in, void *data) {
 int inpmod_passthrough(inpmod_t *in, uint8_t *data, int len, inpmod_screen_cfg_t* screen_cfg) {
     if(in == nullptr || !in->init)
         return -1;
-    if(screen_cfg)
-        input::touch_port_event->raise(input::make_port(screen_cfg));
+    if(screen_cfg) {
+        delete in->screen_cfg;
+        in->screen_cfg = new inpmod_screen_cfg_t(*screen_cfg);
+        input::touch_port_event->raise(input::make_port(in->screen_cfg));
+    }
     std::vector<uint8_t> input_data;
     input_data.reserve(len);
     input_data.assign(data, data + len);
+    input::print(input_data.data());
     input::passthrough(input::input_inst, std::move(input_data));
     return 0;
 }

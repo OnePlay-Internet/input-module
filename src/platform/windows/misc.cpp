@@ -17,6 +17,7 @@
 
 using namespace std::literals;
 namespace platf {
+#if 0
 using adapteraddrs_t = util::c_ptr<IP_ADAPTER_ADDRESSES>;
 
 std::filesystem::path appdata() {
@@ -87,6 +88,7 @@ std::string get_mac_address(const std::string_view &address) {
   BOOST_LOG(warning) << "Unable to find MAC address for "sv << address;
   return "00:00:00:00:00:00"s;
 }
+#endif
 
 HDESK syncThreadDesktop() {
   auto hDesk = OpenInputDesktop(DF_ALLOWOTHERACCOUNTHOOK, FALSE, GENERIC_ALL);
@@ -107,6 +109,7 @@ HDESK syncThreadDesktop() {
   return hDesk;
 }
 
+#if 0
 void print_status(const std::string_view &prefix, HRESULT status) {
   char err_string[1024];
 
@@ -120,4 +123,5 @@ void print_status(const std::string_view &prefix, HRESULT status) {
 
   BOOST_LOG(error) << prefix << ": "sv << std::string_view { err_string, bytes };
 }
+#endif
 } // namespace platf
