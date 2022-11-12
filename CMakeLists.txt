@@ -1,13 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
 project(input-module)
 
-set(Boost_USE_STATIC_LIBS ON)
+option(BUILD_TEST "Build tests" ON)
+
+if(NOT APPLE)
+	set(Boost_USE_STATIC_LIBS ON)
+endif()
 
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS log REQUIRED)
 
 set(inputmodule_SOURCE_FILES 
-    third-party/moonlight-common-c/src/Input.h
     src/config.cpp
     src/config.h
     src/input_impl.cpp
@@ -36,29 +39,47 @@ if(WIN32)
     
     set_source_files_properties(third-party/ViGEmClient/src/ViGEmClient.cpp PROPERTIES COMPILE_DEFINITIONS "UNICODE=1;ERROR_INVALID_DEVICE_OBJECT_PARAMETER=650")
     set_source_files_properties(third-party/ViGEmClient/src/ViGEmClient.cpp PROPERTIES COMPILE_FLAGS "-Wno-unknown-pragmas -Wno-misleading-indentation -Wno-class-memaccess")
+
+    set(inputmodule_INCLUDE_DIRS
+        third-party/ViGEmClient/include)
+
+    set(inputmodule_PLATFORM_LIBS
+        setupapi)
 endif()
 
-add_library(inputmodule STATIC
-    ${inputmodule_SOURCE_FILES}
-    ${inputmodule_PLATFORM_FILES}
-)
+set(CMAKE_DEBUG_POSTFIX -debug)
 
+add_library(inputmodule STATIC
+${inputmodule_SOURCE_FILES}
+${inputmodule_PLATFORM_FILES})
+add_library(inputmodule::inputmodule ALIAS inputmodule)
 target_include_directories(inputmodule PRIVATE
     ${BOOST_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/third-party
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-if(WIN32)
-    target_include_directories(inputmodule PRIVATE third-party/ViGEmClient/include)
-endif()
-
+    ${inputmodule_INCLUDE_DIRS})
 target_link_libraries(inputmodule PRIVATE
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
-    setupapi)
+    ${inputmodule_PLATFORM_LIBS})
+set_target_properties(inputmodule PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+
+# Install
+# set(CMAKE_INSTALL_PREFIX CACHE STRING ${CMAKE_CURRENT_SOURCE_DIR})
+set(inputmodule_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set(inputmodule_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include)
+set(inputmodule_INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/cmake)
+install(TARGETS inputmodule EXPORT InputModuleTarget DESTINATION ${inputmodule_INSTALL_LIB_DIR})
+install(FILES include/input_module.h include/input_packet.h DESTINATION ${inputmodule_INSTALL_INCLUDE_DIR})
+install(EXPORT InputModuleTarget
+        FILE InputModuleTarget.cmake
+        NAMESPACE inputmodule::
+        DESTINATION ${inputmodule_INSTALL_CMAKE_DIR}
+)
 
 # Test
-add_subdirectory(tests)
+if(${BUILD_TEST})
+    add_subdirectory(tests)
+endif()
