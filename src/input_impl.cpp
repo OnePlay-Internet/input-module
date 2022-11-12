@@ -3,7 +3,8 @@
 // define uint32_t for <moonlight-common-c/src/Input.h>
 #include <cstdint>
 extern "C" {
-#include <moonlight-common-c/src/Input.h>
+// #include <moonlight-common-c/src/Input.h>
+#include "input_packet.h"
 }
 
 #include <bitset>

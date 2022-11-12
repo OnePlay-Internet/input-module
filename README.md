@@ -17,8 +17,9 @@ cmake --build build
 Install artifacts: `/include`, `/lib`, `/cmake`.
 ```
 # should use a local install location
-cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=.
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TEST=OFF -DCMAKE_INSTALL_PREFIX=.
 cmake --build build
+cmake --install build
 ```
 
 ## Integrate as a subproject

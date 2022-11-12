@@ -8,8 +8,8 @@
 #include <functional>
 
 #include "input_module.h"
+#include "input_packet.h"
 #include "utility.h"
-#include <moonlight-common-c/src/Input.h>
 
 /**
  * Test cases:
@@ -78,6 +78,7 @@ void test_rel_mouse(void* t) {
 
     std::cout << "Init input module" << std::endl;
     inpmod_t* in = inpmod_init(&screen_cfg);
+    inpmod_log_level(in, 0);
 
     std::cout << "Mouse move packet" << std::endl;
     NV_REL_MOUSE_MOVE_PACKET packet;
@@ -87,16 +88,41 @@ void test_rel_mouse(void* t) {
     packet.magic = util::endian::little(magic);
 
     // move right
-    packet.deltaX = util::endian::big((short)5000); 
-    packet.deltaY = util::endian::big((short)5000);
-    std::cout << "Send packet" << std::endl;
+    packet.deltaX = util::endian::big((short)500); 
+    packet.deltaY = util::endian::big((short)0);
+    std::cout << "Send packet 1" << std::endl;
     inpmod_print(in, (uint8_t *)&packet);
     inpmod_passthrough(in, (uint8_t *)&packet, sizeof(packet));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    // move down
+    packet.deltaX = util::endian::big((short)0); 
+    packet.deltaY = util::endian::big((short)500);
+    std::cout << "Send packet 2" << std::endl;
+    inpmod_print(in, (uint8_t *)&packet);
+    inpmod_passthrough(in, (uint8_t *)&packet, sizeof(packet));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+    // move left
+    packet.deltaX = util::endian::big((short)-500); 
+    packet.deltaY = util::endian::big((short)0);
+    std::cout << "Send packet 3" << std::endl;
+    inpmod_print(in, (uint8_t *)&packet);
+    inpmod_passthrough(in, (uint8_t *)&packet, sizeof(packet));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+    // move up
+    packet.deltaX = util::endian::big((short)0); 
+    packet.deltaY = util::endian::big((short)-500);
+    std::cout << "Send packet 4" << std::endl;
+    inpmod_print(in, (uint8_t *)&packet);
+    inpmod_passthrough(in, (uint8_t *)&packet, sizeof(packet));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+    inpmod_wait(in, 30);
 
     std::cout << "Deinit input module" << std::endl;
-    //inpmod_deinit(in);
+    inpmod_deinit(in);
 
     std::cout << "Set test result" << std::endl;
     runner->set_test_result("test_rel_mouse", true);
