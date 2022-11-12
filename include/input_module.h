@@ -47,6 +47,10 @@ int inpmod_print(inpmod_t *in, void *data);
 
 int inpmod_passthrough(inpmod_t *in, uint8_t *data, int len, inpmod_screen_cfg_t* screen_cfg = NULL);
 
+int inpmod_log_level(inpmod_t *in, int level);
+
+int inpmod_wait(inpmod_t *in, int sec);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

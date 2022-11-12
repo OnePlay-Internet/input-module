@@ -1,3 +1,5 @@
+#include <chrono>
+#include <thread>
 #include <string_view>
 
 #include "main.h"
@@ -104,5 +106,26 @@ int inpmod_passthrough(inpmod_t *in, uint8_t *data, int len, inpmod_screen_cfg_t
     input_data.assign(data, data + len);
     input::print(input_data.data());
     input::passthrough(input::input_inst, std::move(input_data));
+    return 0;
+}
+
+int inpmod_log_level(inpmod_t *in, int level) {
+    if(in == nullptr || !in->init)
+        return -1;
+    set_log_level(level);
+    return 0;
+}
+
+int inpmod_wait(inpmod_t *in, int sec) {
+    if(in == nullptr || !in->init)
+        return -1;
+    auto start = std::chrono::steady_clock::now();
+    while(task_pool.next() != std::nullopt) {
+        auto now = std::chrono::steady_clock::now();
+        if(std::chrono::duration_cast<std::chrono::seconds>(now - start).count() > sec) {
+            return -1;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
     return 0;
 }

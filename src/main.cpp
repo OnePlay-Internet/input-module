@@ -1,6 +1,7 @@
 // Created by loki on 5/30/19.
 
 #include <iostream>
+#include <algorithm>
 
 #include <boost/log/attributes/clock.hpp>
 #include <boost/log/common.hpp>
@@ -37,7 +38,7 @@ int log_init() {
 
   boost::shared_ptr<std::ostream> stream { &std::cout, NoDelete {} };
   sink->locked_backend()->add_stream(stream);
-  sink->set_filter(severity >= 0);
+  sink->set_filter(severity >= 3);
 
   sink->set_formatter([message = "Message"s, severity = "Severity"s](const bl::record_view &view, bl::formatting_ostream &os) {
     constexpr int DATE_BUFFER_SIZE = 21 + 2 + 1; // Full string plus ": \0"
@@ -86,4 +87,9 @@ int log_init() {
   // }
 
   return 0;
+}
+
+void set_log_level(int level) {
+  int log_level = std::clamp(level, 0, 5);
+  sink->set_filter(severity >= log_level);
 }

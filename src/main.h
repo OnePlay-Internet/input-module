@@ -22,6 +22,7 @@ extern boost::log::sources::severity_logger<int> fatal;
 
 void log_flush();
 int log_init();
+void set_log_level(int level);
 
 // void print_help(const char *name);
 
