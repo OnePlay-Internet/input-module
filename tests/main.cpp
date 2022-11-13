@@ -10,6 +10,36 @@
 #include "input_module.h"
 #include "input_packet.h"
 #include "utility.h"
+#include "matoya.h"
+
+
+// Your top level application context
+struct context {
+	MTY_App *app;
+	bool quit;
+};
+
+// This function will fire for each event
+static void event_func(const MTY_Event *evt, void *opaque)
+{
+	struct context *ctx = (struct context *)opaque;
+
+	MTY_PrintEvent(evt);
+
+	if (evt->type == MTY_EVENT_CLOSE)
+		ctx->quit = true;
+}
+
+// This function fires once per "cycle", either blocked by a
+// call to MTY_WindowPresent or limited by MTY_AppSetTimeout
+static bool app_func(void *opaque)
+{
+	struct context *ctx = (struct context *)opaque;
+
+	MTY_WindowPresent(ctx->app, 0);
+
+	return !ctx->quit;
+}
 
 /**
  * Test cases:
@@ -66,6 +96,24 @@ int main(int argc, char *argv[]) {
         f(&t);
     }
     t.print_test_result();
+
+    // Set up the application object and attach it to your context
+	struct context ctx = {0};
+	ctx.app = MTY_AppCreate(app_func, event_func, &ctx);
+	if (!ctx.app)
+		return 1;
+
+	// Create a window
+	MTY_WindowCreate(ctx.app, "My Window", NULL, 0);
+
+	// Set the graphics API to OpenGL
+	MTY_WindowSetGFX(ctx.app, 0, MTY_GFX_GL, true);
+
+	// Run the app -- blocks until your app_func returns false
+	MTY_AppRun(ctx.app);
+	MTY_AppDestroy(&ctx.app);
+
+    return 0;
 }
 
 void test_rel_mouse(void* t) {

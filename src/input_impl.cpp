@@ -8,6 +8,7 @@ extern "C" {
 }
 
 #include <bitset>
+#include <array>
 #include <unordered_map>
 
 #include "config.h"

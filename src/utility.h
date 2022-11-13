@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
+#include <cctype>
 
 #define KITTY_WHILE_LOOP(x, y, z) \
   {                               \
@@ -329,7 +330,7 @@ inline std::string from_hex_vec(const std::string &hex, bool rev = false) {
 
   static char constexpr shift_bit = 'a' - 'A';
   auto is_convertable             = [](char ch) -> bool {
-    if(isdigit(ch)) {
+    if(std::isdigit(ch)) {
       return true;
     }
 
@@ -408,6 +409,24 @@ inline std::int64_t from_chars(const char *begin, const char *end) {
 
   return *begin != '-' ? res + (std::int64_t)(*begin - '0') * mul : -res;
 }
+
+#ifdef _MSC_VER
+inline std::int64_t from_chars(std::string_view::const_iterator begin, std::string_view::const_iterator end) {
+  if(begin == end) {
+    return 0;
+  }
+
+  std::int64_t res {};
+  std::int64_t mul = 1;
+  while(begin != --end) {
+    res += (std::int64_t)(*end - '0') * mul;
+
+    mul *= 10;
+  }
+
+  return *begin != '-' ? res + (std::int64_t)(*begin - '0') * mul : -res;
+}
+#endif
 
 inline std::int64_t from_view(const std::string_view &number) {
   return from_chars(std::begin(number), std::end(number));
