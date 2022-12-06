@@ -14,6 +14,8 @@ find_package(Boost COMPONENTS log REQUIRED)
 message(STATUS "Boost version: ${Boost_VERSION}")
 message(STATUS "BOOST_INCLUDE_DIRS: ${Boost_INCLUDE_DIR}")
 
+add_subdirectory(tests)
+
 set(inputmodule_SOURCE_FILES 
     src/config.cpp
     src/config.h
